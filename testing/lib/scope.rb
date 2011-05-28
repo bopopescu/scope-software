@@ -1,4 +1,5 @@
 require 'usb'
+require 'rubygems'
 require 'terminal-table/import'
 require 'lib/constants'
 require 'lib/helpers'
@@ -12,6 +13,13 @@ module USBScope
 						@dev = self.class.getDevice()
 						@handle = self.class.getHandle(@dev)
 						@usb_status = :connected
+				end
+
+				def dataprint(x)
+						x.each_byte { |b|
+							print b.to_s(16) + " "
+						}
+						print "\n"
 				end
 
 				def debugwrite(cmd)
@@ -34,8 +42,9 @@ module USBScope
 				end
 
 				def scopewrite(cmd)
-						puts cmd
 						s = cmd.pack("C*")
+						s = s + "\000"*(ScopeEPCtrlLen-s.length)
+						self.dataprint s
 						begin
 								@handle.usb_bulk_write(ScopeEPCtrl,s,TIMEOUT)
 						rescue
