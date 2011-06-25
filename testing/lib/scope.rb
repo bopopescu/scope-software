@@ -57,12 +57,8 @@ module USBScope
 				def scoperead()
 						buffer = ' '*ScopeEPDataLen
 						begin
-								512.times { |i|
-										puts i
-										@handle.usb_bulk_read(ScopeEPData,buffer,TIMEOUT) 
-								}
+								@handle.usb_bulk_read(ScopeEPData,buffer,TIMEOUT) 
 						rescue
-								puts $!
 								puts "Read failed - timeout"
 						end
 						return buffer
@@ -72,6 +68,7 @@ module USBScope
 				def getInfo
 						debugwrite([DebugCommands::Info])
 						d = debugread
+            dataprint d
 						raise "Received wrong packet - not info" if d[0] != 0x15
 						n = ' '
 						cs_table = table do |t|
