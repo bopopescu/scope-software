@@ -1,5 +1,5 @@
-require 'usb'
 require 'rubygems'
+require 'usb'
 require 'terminal-table/import'
 require 'lib/constants'
 require 'lib/helpers'
