@@ -34,7 +34,7 @@ until (action = Readline.readline("?>",true)) == "q"
 		when "d"
 				scope.debugwrite([DebugCommands::Destall])
 		when "sc"
-				scope.scopewrite([0x3C,0x3C,0x03,0x03,0xF0,0xAA])
+				scope.scopewrite([0x3C,0x3C,0x00,0x03,0xF0,0xAA])
 				#scope.dataprint scope.debugread
 		when "r"
 				scope.debugwrite([DebugCommands::Refifo,0xA3,0x11])
