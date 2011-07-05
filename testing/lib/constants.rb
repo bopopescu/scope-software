@@ -12,9 +12,10 @@ module USBScope
 				VID = 0xaaaa
 				PID = 0x0200
 				TIMEOUT = 300
-				DebugEPLen = 64
+				DebugEPInLen = 64
+        DebugEPOutLen = 512
 				DebugEPOut = 0x01
-				DebugEPIn = 0x81
+				DebugEPIn = 0x88
 				ScopeEPCtrlLen = 512
 				ScopeEPCtrl = 0x02
 				ScopeEPDataLen = 512

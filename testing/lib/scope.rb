@@ -25,14 +25,14 @@ module USBScope
 				def debugwrite(cmd)
 						s = cmd.pack("C*")
 						begin
-								@handle.usb_bulk_write(DebugEPOut,s + '\x00'*(DebugEPLen-s.length),TIMEOUT)
+								@handle.usb_bulk_write(DebugEPOut,s + '\x00'*(DebugEPOutLen-s.length),TIMEOUT)
 						rescue
 								puts "Write failed - timeout"
 						end
 				end
 
 				def debugread()
-						buffer = ' '*DebugEPLen
+						buffer = ' '*DebugEPInLen
 						begin
 								@handle.usb_bulk_read(DebugEPIn,buffer,TIMEOUT)
 						rescue
