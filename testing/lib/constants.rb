@@ -1,11 +1,7 @@
 module USBScope
 
 		module DebugCommands
-				LEDOn = 0x10
-				LEDOff = 0x12
 				Info = 0x14
-				Destall = 0x16
-				Refifo = 0x18
 		end
 
 		module ScopeCommands
