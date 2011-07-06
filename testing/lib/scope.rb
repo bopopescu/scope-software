@@ -64,6 +64,16 @@ module USBScope
 						return buffer
 				end
 
+        def readep(num,buflen)
+          buffer = ' '*buflen
+          begin
+              @handle.usb_bulk_read(num, buffer, TIMEOUT)
+          rescue
+              puts "Read failed - timeout"
+          end
+          return buffer
+        end
+
 
 				def getInfo
 						debugwrite([DebugCommands::Info])
