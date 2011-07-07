@@ -16,8 +16,8 @@ module USBScope
         DebugEPOutLen = 512
 				DebugEPOut = 0x01
 				DebugEPIn = 0x88
-				ScopeEPCtrlLen = 64
-				ScopeEPCtrl = 0x02
+				ScopeEPCtrlLen = 512
+				ScopeEPCtrl = 0x04
 				ScopeEPDataLen = 512
 				ScopeEPData = 0x86
 		end

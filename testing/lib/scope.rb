@@ -130,15 +130,13 @@ module USBScope
 						handle = dev.open
 						raise CannotOpenDevice if handle.nil?
 						begin
-								ret = handle.usb_claim_interface(0)
+								ret = handle.usb_claim_interface(1)
 								raise CannotClaimInterface if ret.nil?
 						rescue CannotClaimInterface
-								handle.usb_detach_kernel_driver_np(0,0)
-								handle.usb_claim_interface(0)
+								handle.usb_detach_kernel_driver_np(1,0)
+								handle.usb_claim_interface(1)
 								puts "Detaching kernel driver"
 						end
-						ret = handle.set_altinterface(0)
-						raise CannotSetAltInterface unless ret.nil?
 						return handle
 				end
 
