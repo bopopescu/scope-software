@@ -29,12 +29,15 @@ until (action = Readline.readline("?>",true)) == "q"
 		when "sr"
 				scope.dataprint scope.scoperead
     when "srr"
-        begin
-          while true
-            scope.dataprint scope.scoperead
-          end
-        rescue
-          puts "ran out of data"
+        File.open("/tmp/tmp/scopeout",'w') do |f|
+            begin
+              while true
+                f.write scope.scoperead
+              end
+            rescue
+              f.close
+              puts "ran out of data"
+            end
         end
 		end
 
