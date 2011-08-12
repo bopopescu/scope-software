@@ -17,7 +17,7 @@ module USBScope
 
 				def dataprint(x)
 						x.each_byte { |b|
-							print b.to_s(16) + " "
+							print b.to_s(16)
 						}
 						print "\n"
 				end

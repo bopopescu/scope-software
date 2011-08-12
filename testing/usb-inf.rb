@@ -28,6 +28,14 @@ until (action = Readline.readline("?>",true)) == "q"
 				#scope.dataprint scope.debugread
 		when "sr"
 				scope.dataprint scope.scoperead
+    when "srr"
+        begin
+          while true
+            scope.dataprint scope.scoperead
+          end
+        rescue
+          puts "ran out of data"
+        end
 		end
 
 end
