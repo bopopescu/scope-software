@@ -24,7 +24,7 @@ until (action = Readline.readline("?>",true)) == "q"
     when "dr"
         scope.dataprint scope.readep(0x81,64)
 		when "sc"
-				scope.scopewrite([0x3C,0x3C,0x00,0x03,0xF0,0xAA])
+				scope.scopewrite([0x3C,0x3C,0x03,0x00,0xF0,0xAA]) #note that the scope has byte-order swapped
 				#scope.dataprint scope.debugread
 		when "sr"
 				scope.dataprint scope.scoperead
