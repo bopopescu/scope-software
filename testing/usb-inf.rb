@@ -32,9 +32,12 @@ until (action = Readline.readline("?>",true)) == "q"
 
   when "dr"
     scope.dataprint scope.readep(0x81,64)
+  when "iba"
+    scope.scopewrite([0x3C,0x3C,0xFF,0xFF,0xF1,0xAA])
+  when "ibb"
+    scope.scopewrite([0x3C,0x3C,0xFF,0xFF,0xF2,0xAA])
   when "sc"
     scope.scopewrite([0x3C,0x3C,0x03,0x00,0xF0,0xAA]) #note that the scope has byte-order swapped
-    #scope.dataprint scope.debugread
   when "sr"
     scope.dataprint scope.scoperead
   when "srr"
