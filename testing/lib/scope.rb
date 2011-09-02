@@ -23,20 +23,19 @@ module USBScope
     end
 
     def debugwrite(cmd)
-      s = cmd.pack("C*")
       begin
-        @handle.usb_bulk_write(DebugEPOut,s + '\x00'*(DebugEPOutLen-s.length),TIMEOUT)
+        @handle.usb_control_msg(VendorRequestOut, cmd, 0, 0, "", TIMEOUT)
       rescue
-        puts "Write failed - timeout"
+        puts "Vendor Command failed - #{$!}"
       end
     end
 
-    def debugread()
-      buffer = ' '*DebugEPInLen
+    def debugread(cmd)
+      buffer = ' '*64
       begin
-        @handle.usb_bulk_read(DebugEPIn,buffer,TIMEOUT)
+        @handle.usb_control_msg(VendorRequestIn, cmd, 0, 0, buffer, TIMEOUT)
       rescue
-        puts "Read failed - timeout"
+        puts "Vendor read failed - timeout - #{$!}"
       end
       return buffer
     end
@@ -57,7 +56,7 @@ module USBScope
     def scoperead()
       buffer = ' '*ScopeEPDataLen
       begin
-        @handle.usb_bulk_read(ScopeEPData,buffer,TIMEOUT) 
+        @handle.usb_bulk_read(ScopeEPData,buffer,TIMEOUT)
       rescue
         puts "Read failed - timeout"
       end
@@ -76,8 +75,7 @@ module USBScope
 
 
     def getInfo
-      debugwrite([DebugCommands::Info])
-      d = debugread
+      d = debugread(DebugCommands::Info)
       dataprint d
       raise "Received wrong packet - not info" if d[0] != 0x15
       n = ' '

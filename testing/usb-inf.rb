@@ -26,7 +26,7 @@ until (action = Readline.readline("?>",true)) == "q"
         i += 1
         retry
       else
-        puts "Failed to getInfo - even with retrying"
+        puts "Failed to getInfo - even with retrying - #{$!}"
       end
     end
 
