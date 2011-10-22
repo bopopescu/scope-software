@@ -2,12 +2,13 @@
 
 require 'rubygems'
 require 'scruffy'
-require 'Qt4'
+#require 'Qt4'
 
 require 'readline'
 
 require 'lib/scope'
 include USBScope
+include CONST
 
 def renorm(x)
   x.to_f/255.0*3.3
@@ -33,11 +34,18 @@ until (action = Readline.readline("?>",true)) == "q"
   when "dr"
     scope.dataprint scope.readep(0x81,64)
   when "iba"
-    scope.scopewrite([0x3C,0x3C,0xFF,0xFF,0xF1,0xAA])
+    #Setup relay, setup mux
+    #scope.scopewrite([0xAF,0x10,0x02,0x03,0xAF,0x10,0x20,0x07])
+    scope.scopewrite([scope.genOut(DEST_IBA, WRITE, REG_RELAY, 0x03),
+                      scope.genOut(DEST_IBA, WRITE, REG_MUX0, 0x07)].flatten)
   when "ibb"
-    scope.scopewrite([0x3C,0x3C,0xFF,0xFF,0xF2,0xAA])
   when "sc"
-    scope.scopewrite([0x3C,0x3C,0x03,0x00,0xF0,0xAA]) #note that the scope has byte-order swapped
+    #Setup channels, setup clk, setup PD
+    #scope.scopewrite([0xAF,0x02,0x08,0x03,    0xAF,0x02,0x04,0xF0,    0xAF,0x02,0x06,0x00,    0xAF,0x02,0x02,0x00])
+    scope.scopewrite([scope.genOut(DEST_ADC, WRITE, REG_CHNL, 0x03),
+                      scope.genOut(DEST_ADC, WRITE, REG_CLKL, 0xF0),
+                      scope.genOut(DEST_ADC, WRITE, REG_CLKH, 0x00),
+                      scope.genOut(DEST_ADC, WRITE, REG_PD, 0x00)].flatten)
   when "sr"
     scope.dataprint scope.scoperead
   when "srr"
@@ -73,11 +81,11 @@ until (action = Readline.readline("?>",true)) == "q"
     path = "/tmp/tmp/s-#{t.to_i}.svg"
     g.render :to => path
 
-    app = Qt::Application.new(ARGV)
-    sk = Qt::SvgWidget.new()
-    sk.load(path)
-    sk.show
-    app.exec
+    #app = Qt::Application.new(ARGV)
+    #sk = Qt::SvgWidget.new()
+    #sk.load(path)
+    #sk.show
+    #app.exec
 
   end
 end

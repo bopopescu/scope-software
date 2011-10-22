@@ -7,6 +7,7 @@ require 'lib/helpers'
 module USBScope
   class Scope
     include USBCodes
+    include CONST
     attr_reader :usb_status
 
     def initialize
@@ -50,7 +51,6 @@ module USBScope
         puts $!
         puts "Write failed - timeout"
       end
-
     end
 
     def scoperead()
@@ -73,6 +73,9 @@ module USBScope
       return buffer
     end
 
+    def genOut(dest, rw, reg, value)
+      [MAGIC, dest, (rw + reg << 1), value]
+    end
 
     def getInfo
       d = debugread(DebugCommands::Info)
