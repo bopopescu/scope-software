@@ -43,7 +43,7 @@ until (action = Readline.readline("?>",true)) == "q"
     #Setup channels, setup clk, setup PD
     #scope.scopewrite([0xAF,0x02,0x08,0x03,    0xAF,0x02,0x04,0xF0,    0xAF,0x02,0x06,0x00,    0xAF,0x02,0x02,0x00])
     scope.scopewrite([scope.genOut(DEST_ADC, WRITE, REG_CHNL, 0x03),
-                      scope.genOut(DEST_ADC, WRITE, REG_CLKL, 0xF0),
+                      scope.genOut(DEST_ADC, WRITE, REG_CLKL, 0x10),
                       scope.genOut(DEST_ADC, WRITE, REG_CLKH, 0x00),
                       scope.genOut(DEST_ADC, WRITE, REG_PD, 0x00)].flatten)
   when "sr"
