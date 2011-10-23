@@ -54,7 +54,7 @@ module USBScope
     end
 
     def scoperead()
-      buffer = ' '*ScopeEPDataLen
+      buffer = "\000"*ScopeEPDataLen
       begin
         @handle.usb_bulk_read(ScopeEPData,buffer,TIMEOUT)
       rescue
