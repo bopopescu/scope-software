@@ -64,7 +64,7 @@ module USBScope
     end
 
     def readep(num,buflen)
-      buffer = ' '*buflen
+      buffer = "\000"*buflen
       begin
         @handle.usb_bulk_read(num, buffer, TIMEOUT)
       rescue

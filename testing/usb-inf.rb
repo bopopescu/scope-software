@@ -33,6 +33,11 @@ until (action = Readline.readline("?>",true)) == "q"
 
   when "dr"
     scope.dataprint scope.readep(0x81,64)
+  when "si"
+    scope.scopewrite([scope.genOut(DEST_SCOPE, READ, REG_IB, 0x00),
+                      scope.genOut(DEST_SCOPE, READ, REG_IBA, 0x00),
+                      scope.genOut(DEST_SCOPE, READ, REG_IBB, 0x00)].flatten)
+    scope.dataprint scope.readep(USBCodes::ScopeEPCFG, 512)
   when "iba"
     #Setup relay, setup mux
     scope.scopewrite([scope.genOut(DEST_IBA, WRITE, REG_RELAY, 0x03),

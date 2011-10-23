@@ -16,6 +16,7 @@ module USBScope
     ScopeEPCtrl = 0x04
     ScopeEPDataLen = 512
     ScopeEPData = 0x86
+    ScopeEPCFG = 0x88
 
     VendorRequestOut = 0x40
     VendorRequestIn = 0xC0
@@ -29,6 +30,8 @@ module USBScope
     DEST_IBB = 0x11
 
     REG_IB = 0x01
+    REG_IBA = 0x10;
+    REG_IBB = 0x11;
 
     REG_PD = 0x01
     REG_CLKL = 0x02
