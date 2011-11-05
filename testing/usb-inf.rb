@@ -35,20 +35,20 @@ until (action = Readline.readline("?>",true)) == "q"
     scope.dataprint scope.readep(0x81,64)
   when "si"
     scope.scopewrite([scope.genOut(DEST_SCOPE, READ, REG_IB, 0x00),
-                      scope.genOut(DEST_SCOPE, READ, REG_IBA, 0x00),
-                      scope.genOut(DEST_SCOPE, READ, REG_IBB, 0x00)].flatten)
+                     scope.genOut(DEST_SCOPE, READ, REG_IBA, 0x00),
+                     scope.genOut(DEST_SCOPE, READ, REG_IBB, 0x00)].flatten)
     scope.dataprint scope.readep(USBCodes::ScopeEPCFG, 512)
   when "iba"
     #Setup relay, setup mux
     scope.scopewrite([scope.genOut(DEST_IBA, WRITE, REG_RELAY, 0x03),
-                      scope.genOut(DEST_IBA, WRITE, REG_MUX0, 0x07)].flatten)
+                     scope.genOut(DEST_IBA, WRITE, REG_MUX0, 0x07)].flatten)
   when "ibb"
   when "sc"
     #Setup channels, setup clk, setup PD
     scope.scopewrite([scope.genOut(DEST_ADC, WRITE, REG_CHNL, 0x03),
-                      scope.genOut(DEST_ADC, WRITE, REG_CLKL, 0xF0),
-                      scope.genOut(DEST_ADC, WRITE, REG_CLKH, 0x00),
-                      scope.genOut(DEST_ADC, WRITE, REG_PD, 0x00)].flatten)
+                     scope.genOut(DEST_ADC, WRITE, REG_CLKL, 0xF0),
+                     scope.genOut(DEST_ADC, WRITE, REG_CLKH, 0x00),
+                     scope.genOut(DEST_ADC, WRITE, REG_PD, 0x00)].flatten)
   when "stop"
     scope.scopewrite(scope.genOut(DEST_ADC, WRITE, REG_PD, 0x01))
   when "start"
@@ -64,6 +64,30 @@ until (action = Readline.readline("?>",true)) == "q"
       rescue
         f.close
         puts "ran out of data"
+      end
+    end
+  when "sr2"
+    File.open("/tmp/tmp/scopeouta","w") do |fa|
+      File.open("/tmp/tmp/scopeoutb","w") do |fb|
+        begin
+          1000.times do
+            d = scope.scoperead
+            which = 0;
+            d.each_char do
+              |x|
+              if which == 0 then
+                fa.write x + "\n"
+                which = 1
+              else
+                fb.write x + "\n"
+                which = 0
+              end
+            end
+          end
+        rescue
+          puts "ran out of data"
+          puts $!
+        end
       end
     end
   when "sp"
