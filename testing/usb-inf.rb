@@ -14,109 +14,130 @@ def renorm(x)
   x.to_f/255.0*3.3
 end
 
-scope = Scope.new
+def getInfo
+  i = 0
+  begin
+    scope.getInfo
+  rescue
+    if i < 3 then
+      i += 1
+      retry
+    else
+      puts "Failed to getInfo - even with retrying - #{$!}"
+    end
+  end
+end
 
-until (action = Readline.readline("?>",true)) == "q"
-  case action
-  when "i"
-    i = 0
+def dataread
+  scope.dataprint scope.readep(0x81,64)
+end
+
+def testib
+  scope.scopewrite([scope.genOut(DEST_SCOPE, READ, REG_IB, 0x00),
+                   scope.genOut(DEST_SCOPE, READ, REG_IBA, 0x00),
+                   scope.genOut(DEST_SCOPE, READ, REG_IBB, 0x00)].flatten)
+  scope.dataprint scope.readep(USBCodes::ScopeEPCFG, 512)
+end
+
+def ibainit
+  #Setup relay, setup mux
+  scope.scopewrite([scope.genOut(DEST_IBA, WRITE, REG_RELAY, 0x03),
+                   scope.genOut(DEST_IBA, WRITE, REG_MUX0, 0x07)].flatten)
+end
+
+def scopeinit
+  #Setup channels, setup clk, setup PD
+  scope.scopewrite([scope.genOut(DEST_ADC, WRITE, REG_CHNL, 0x03),
+                   scope.genOut(DEST_ADC, WRITE, REG_CLKL, 0xF0),
+                   scope.genOut(DEST_ADC, WRITE, REG_CLKH, 0x00),
+                   scope.genOut(DEST_ADC, WRITE, REG_PD, 0x00)].flatten)
+end
+
+def stop
+  scope.scopewrite(scope.genOut(DEST_ADC, WRITE, REG_PD, 0x01))
+end
+
+def start
+  scope.scopewrite(scope.genOut(DEST_ADC, WRITE, REG_PD, 0x00))
+end
+
+def scoperead
+  scope.dataprint scope.scoperead
+end
+
+def scoperepread
+  File.open("/tmp/scopeout",'w') do |f|
     begin
-      scope.getInfo
+      while true
+        f.write scope.scoperead
+      end
     rescue
-      if i < 3 then
-        i += 1
-        retry
-      else
-        puts "Failed to getInfo - even with retrying - #{$!}"
-      end
+      f.close
+      puts "ran out of data"
     end
+  end
+end
 
-  when "dr"
-    scope.dataprint scope.readep(0x81,64)
-  when "si"
-    scope.scopewrite([scope.genOut(DEST_SCOPE, READ, REG_IB, 0x00),
-                     scope.genOut(DEST_SCOPE, READ, REG_IBA, 0x00),
-                     scope.genOut(DEST_SCOPE, READ, REG_IBB, 0x00)].flatten)
-    scope.dataprint scope.readep(USBCodes::ScopeEPCFG, 512)
-  when "iba"
-    #Setup relay, setup mux
-    scope.scopewrite([scope.genOut(DEST_IBA, WRITE, REG_RELAY, 0x03),
-                     scope.genOut(DEST_IBA, WRITE, REG_MUX0, 0x07)].flatten)
-  when "ibb"
-  when "sc"
-    #Setup channels, setup clk, setup PD
-    scope.scopewrite([scope.genOut(DEST_ADC, WRITE, REG_CHNL, 0x03),
-                     scope.genOut(DEST_ADC, WRITE, REG_CLKL, 0xF0),
-                     scope.genOut(DEST_ADC, WRITE, REG_CLKH, 0x00),
-                     scope.genOut(DEST_ADC, WRITE, REG_PD, 0x00)].flatten)
-  when "stop"
-    scope.scopewrite(scope.genOut(DEST_ADC, WRITE, REG_PD, 0x01))
-  when "start"
-    scope.scopewrite(scope.genOut(DEST_ADC, WRITE, REG_PD, 0x00))
-  when "sr"
-    scope.dataprint scope.scoperead
-  when "srr"
-    File.open("/tmp/tmp/scopeout",'w') do |f|
+def scoperepread2
+  File.open("/tmp/scopeouta","w") do |fa|
+    File.open("/tmp/scopeoutb","w") do |fb|
       begin
-        while true
-          f.write scope.scoperead
-        end
-      rescue
-        f.close
-        puts "ran out of data"
-      end
-    end
-  when "sr2"
-    File.open("/tmp/tmp/scopeouta","w") do |fa|
-      File.open("/tmp/tmp/scopeoutb","w") do |fb|
-        begin
-          1000.times do
-            d = scope.scoperead
-            which = 0;
-            d.each_char do
-              |x|
-              if which == 0 then
-                fa.write x + "\n"
-                which = 1
-              else
-                fb.write x + "\n"
-                which = 0
-              end
+        1000.times do
+          d = scope.scoperead
+          which = 0;
+          d.each_char do
+            |x|
+            if which == 0 then
+              fa.write x + "\n"
+              which = 1
+            else
+              fb.write x + "\n"
+              which = 0
             end
           end
-        rescue
-          puts "ran out of data"
-          puts $!
         end
+      rescue
+        puts "ran out of data"
+        puts $!
       end
     end
-  when "sp"
-    t = Time.now
-    d = scope.scoperead
+  end
+end
 
-    da = []
-    db = []
-    which = 0;
-    d.each_byte do
-      |x|
-      da.push renorm x if which == 0
-      db.push renorm x if which == 1
-      which = (which == 0) ? 1 : 0
-    end
+def processAction(action)
+  case action
+  when "i"
+    getInfo
+  when "dr"
+    dataread
+  when "si"
+    testib
+  when "iba"
+    ibainit
+  when "sc"
+    scopeinit
+  when "stop"
+    stop
+  when "start"
+    start
+  when "sr"
+    scoperead
+  when "srr"
+    scoperepread
+  when "sr2"
+    scoperepread2
+  end
+end
 
-    g = Scruffy::Graph.new
-    g.title = "Scope read at #{t}"
-    g.renderer = Scruffy::Renderers::Standard.new
-    g.add :line, 'A', da
-    g.add :line, 'B', db
-    path = "/tmp/tmp/s-#{t.to_i}.svg"
-    g.render :to => path
 
-    app = Qt::Application.new(ARGV)
-    sk = Qt::SvgWidget.new()
-    sk.load(path)
-    sk.show
-    app.exec
+###############################################################################
+###############################################################################
 
+scope = Scope.new
+if ARGV.length > 0 then
+  processAction ARGV[0]
+else
+  until (action = Readline.readline("?>",true)) == "q"
+    processAction action
   end
 end

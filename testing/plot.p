@@ -1,8 +1,8 @@
-#set terminal postscript enhanced color
-#set output "| ps2pdf - /tmp/tmp/scope.pdf"
+set terminal postscript enhanced color
+set output "| ps2pdf - /tmp/tmp/scope.pdf"
 #set output "/tmp/tmp/scope.eps"
-set terminal png size 30000,2000
-set output "/tmp/tmp/scope.png"
+#set terminal png size 30000,2000
+#set output "/tmp/tmp/scope.png"
 set autoscale
 unset log
 unset label
