@@ -81,7 +81,8 @@ int ScopeV1::setup(unsigned int clk, bool chnlA, bool chnlB)
   memcpy(&usb_buf[8], cfg_buf, 4);
 
   //Send config packet
-  ret = libusb_bulk_transfer(dev, EPCFG, usb_buf, EPCFG_LEN, null, USB_TIMEOUT);
+  int actual;
+  ret = libusb_bulk_transfer(dev, EPCFG, usb_buf, 4*3, &actual, USB_TIMEOUT);
   if(ret != 0)
   {
     fprintf(stderr, "Failed to send setup packet: %d\n", ret);
@@ -110,7 +111,8 @@ int ScopeV1::start()
   memcpy(usb_buf, cfg_buf, 4);
 
   //Send config packet
-  ret = libusb_bulk_transfer(dev, EPCFG, usb_buf, EPCFG_LEN, null, USB_TIMEOUT);
+  int actual;
+  ret = libusb_bulk_transfer(dev, EPCFG, usb_buf, 4, &actual, USB_TIMEOUT);
   if(ret != 0)
   {
     fprintf(stderr, "Failed to send setup packet: %d\n", ret);
@@ -139,10 +141,34 @@ int ScopeV1::stop()
   memcpy(usb_buf, cfg_buf, 4);
 
   //Send config packet
-  ret = libusb_bulk_transfer(dev, EPCFG, usb_buf, EPCFG_LEN, null, USB_TIMEOUT);
+  int actual;
+  ret = libusb_bulk_transfer(dev, EPCFG, usb_buf, 4, &actual, USB_TIMEOUT);
   if(ret != 0)
   {
     fprintf(stderr, "Failed to send setup packet: %d\n", ret);
+    return -1;
+  }
+
+  return 0;
+}
+
+int ScopeV1::read(unsigned char* buf, int len)
+{
+  int ret;
+
+  if(!dev)
+  {
+    ret = init();
+    if(ret != 0)
+      return ret;
+  }
+
+  //Perform read(s)
+  int actual;
+  ret = libusb_bulk_transfer(dev, EPDATA, buf, len, &actual, USB_TIMEOUT);
+  if(ret != 0)
+  {
+    fprintf(stderr, "Failed to read data: %d\n", ret);
     return -1;
   }
 

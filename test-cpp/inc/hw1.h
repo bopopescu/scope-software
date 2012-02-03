@@ -75,7 +75,7 @@ class ScopeV1
   int start();
   int stop();
 
-  int read(unsigned char* buffer, unsigned int len);
+  int read(unsigned char* buf, int len, int* size);
 
   private:
   libusb_context* ctx;
