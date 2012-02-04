@@ -77,6 +77,10 @@ class ScopeV1
 
   int read(unsigned char* buf, int len, int* size);
 
+  //chnlA.length + chnlB.length = len. Even split...
+  void processRawChannels(unsigned char* buf, int len, unsigned char *chnlA, unsigned char *chnlB);
+  void processVoltChannel(unsigned char* raw, int len, unsigned char* volt);
+
   private:
   libusb_context* ctx;
   libusb_device* dev;

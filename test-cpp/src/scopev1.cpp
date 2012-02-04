@@ -174,3 +174,25 @@ int ScopeV1::read(unsigned char* buf, int len)
 
   return 0;
 }
+
+void ScopeV1::processRawChannels(unsigned char* buf, int len, unsigned char *chnlA, unsigned char* chnlB)
+{
+  for(int i=0; i<len; i++)
+  {
+    if(i % 2)
+      chnlB[i/2] = buf[i];
+    else
+      chnlA[i/2] = buf[i];
+  }
+}
+
+void ScopeV1::processVoltChannel(unsigned char* raw, int len, float *volt)
+{
+  for(int i=0; i<len; i++)
+  {
+    signed char v = (signed char)raw[i];
+    float f = v * 3.3 * 1000 / 255;
+    float fin = f / 11.02564103; //INPUT MULTIPLIER
+    volt[i] = fin;
+  }
+}
