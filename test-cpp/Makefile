@@ -1,14 +1,21 @@
 INCLUDE=-Iinc/ -I/usr/include/libusb-1.0/
-LIBS=
+LIBS=-lusb-1.0
+
+CXX=g++
+CXXFLAGS=-Wall -Werror
 
 scope: main.o scopev1.o v1format.o
-	g++ -o scope main.o scopev1.o v1format.o ${INCLUDE} ${LIBS}
+	${CXX} ${CXXFLAGS} -o scope main.o scopev1.o v1format.o ${INCLUDE} ${LIBDIRS} ${LIBS}
 
 scopev1.o: src/scopev1.cpp
-	g++ -o scopev1.o src/scopev1.cpp ${INCLUDE} ${LIBS}
+	${CXX} ${CXXFLAGS} -c src/scopev1.cpp ${INCLUDE} ${LIBDIRS} ${LIBS}
 
 v1format.o: src/v1format.cpp
-	g++ -o v1format.o src/v1format.cpp ${INCLUDE} ${LIBS}
+	${CXX} ${CXXFLAGS} -c src/v1format.cpp ${INCLUDE} ${LIBDIRS} ${LIBS}
 
 main.o: src/main.cpp
-	g++ -o main.o src/main.cpp ${INCLUDE} ${LIBS}
+	${CXX} ${CXXFLAGS} -c src/main.cpp ${INCLUDE} ${LIBDIRS} ${LIBS}
+
+.PHONY: clean
+clean:
+	rm -f *.o scope

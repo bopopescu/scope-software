@@ -17,7 +17,7 @@ V1Format::V1Format()
 {
 }
 
-static void V1Format::genFX2Packet(unsigned char dest, bool read, unsigned char reg, unsigned char value, unsigned char* buf)
+void V1Format::genFX2Packet(unsigned char dest, bool read, unsigned char reg, unsigned char value, unsigned char* buf)
 {
   buf[0] = FMT_MAGIC;
   buf[1] = dest;

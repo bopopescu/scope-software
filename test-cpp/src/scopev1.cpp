@@ -13,13 +13,14 @@
  */
 
 #include <string.h>
+#include <stdio.h>
 #include <libusb.h>
 #include "hw1.h"
 
 ScopeV1::ScopeV1()
 {
-  ctx = null;
-  dev = null;
+  ctx = NULL;
+  dev = NULL;
 }
 
 ScopeV1::~ScopeV1()
@@ -152,7 +153,7 @@ int ScopeV1::stop()
   return 0;
 }
 
-int ScopeV1::read(unsigned char* buf, int len)
+int ScopeV1::read(unsigned char* buf, int len, int* actual)
 {
   int ret;
 
@@ -164,8 +165,7 @@ int ScopeV1::read(unsigned char* buf, int len)
   }
 
   //Perform read(s)
-  int actual;
-  ret = libusb_bulk_transfer(dev, EPDATA, buf, len, &actual, USB_TIMEOUT);
+  ret = libusb_bulk_transfer(dev, EPDATA, buf, len, actual, USB_TIMEOUT);
   if(ret != 0)
   {
     fprintf(stderr, "Failed to read data: %d\n", ret);

@@ -25,7 +25,7 @@
 #define EPCTRL          0x04
 #define EPDATA_LEN      512
 #define EPDATA          0x86
-#define ECFG_LEN        512
+#define EPCFG_LEN        512
 #define EPCFG           0x88
 
 #define FX2_CMD_INFO    0x14
@@ -61,7 +61,7 @@ class V1Format
   V1Format();
 
   static void genFX2Packet(unsigned char dest, bool read, unsigned char reg, unsigned char value, unsigned char* buf);
-}
+};
 
 class ScopeV1
 {
@@ -75,15 +75,15 @@ class ScopeV1
   int start();
   int stop();
 
-  int read(unsigned char* buf, int len, int* size);
+  int read(unsigned char* buf, int len, int* actual);
 
   //chnlA.length + chnlB.length = len. Even split...
   void processRawChannels(unsigned char* buf, int len, unsigned char *chnlA, unsigned char *chnlB);
-  void processVoltChannel(unsigned char* raw, int len, unsigned char* volt);
+  void processVoltChannel(unsigned char* raw, int len, float* volt);
 
   private:
   libusb_context* ctx;
-  libusb_device* dev;
+  libusb_device_handle* dev;
 };
 
 #endif

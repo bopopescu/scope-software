@@ -20,15 +20,13 @@
 
 #define MAX_READ EPDATA_LEN*20
 
-ScopeV1 scope;
-
-int main(char* argv, int argc)
+int main(int argc, char** argv)
 {
   int ret;
 
   //Try to get device
   printf("Finding scope device.\n");
-  scope = new ScopeV1();
+  ScopeV1* scope = new ScopeV1();
   ret = scope->setup(0x00F0, true, true); //TODO: allow config from ARGV
   if(ret != 0)
   {
@@ -82,12 +80,12 @@ int main(char* argv, int argc)
   //Do some processing to get into a sensible form
   int chnlLen = actual;
   if((actual % 2) != 0)
-    chnlLen--1;
+    chnlLen--;
 
-  unsigned char* rawChnlA = malloc(chnlLen);
-  unsigned char* rawChnlB = malloc(chnlLen);
-  float* voltChnlA = malloc(chnlLen * sizeof(float));
-  float* voltChnlB = malloc(chnlLen * sizeof(float));
+  unsigned char* rawChnlA = (unsigned char*)malloc(chnlLen);
+  unsigned char* rawChnlB = (unsigned char*)malloc(chnlLen);
+  float* voltChnlA = (float*)malloc(chnlLen * sizeof(float));
+  float* voltChnlB = (float*)malloc(chnlLen * sizeof(float));
   if(!rawChnlA || !rawChnlB || !voltChnlA || !voltChnlB)
   {
     fprintf(stderr, "Failed to malloc the channel buffers\n");
@@ -108,7 +106,7 @@ int main(char* argv, int argc)
   ret = fputs("T/clocks,A/mv,B/mv\n", fd);
   if(ret == EOF)
   {
-    fprintf("Failed to write CSV header\n");
+    fprintf(stderr, "Failed to write CSV header\n");
     ret = -7;
     goto cleanup;
   }
