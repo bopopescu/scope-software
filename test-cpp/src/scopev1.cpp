@@ -19,14 +19,14 @@
 
 ScopeV1::ScopeV1()
 {
-  ctx = NULL;
   dev = NULL;
 }
 
 ScopeV1::~ScopeV1()
 {
   libusb_release_interface(dev, 1);
-  libusb_exit(ctx);
+  libusb_close(dev);
+  libusb_exit(NULL);
 }
 
 int ScopeV1::init()
@@ -34,18 +34,18 @@ int ScopeV1::init()
   int ret;
 
   //Start libusb
-  ret = libusb_init(&ctx);
+  ret = libusb_init(NULL);
   if(ret != 0)
   {
     fprintf(stderr, "Failed to init libusb: %d\n", ret);
     return ret;
   }
 
-  libusb_set_debug(ctx, 3);
+  libusb_set_debug(NULL, 3);
 
   //Get device
-  dev = libusb_open_device_with_vid_pid(ctx, SCOPE_VID, SCOPE_PID);
-  if(!dev)
+  dev = libusb_open_device_with_vid_pid(NULL, SCOPE_VID, SCOPE_PID);
+  if(dev == NULL)
   {
     fprintf(stderr, "Failed to find device. Is it plugged in?\n");
     return -1;
@@ -61,7 +61,7 @@ int ScopeV1::init()
       return -2;
     }
   }
-  else if(ret != 0)
+  else if(ret != 0 && ret != LIBUSB_ERROR_NOT_SUPPORTED)
   {
     fprintf(stderr, "Failed to check if kernel driver was active: %d\n",ret);
     return -3;
@@ -89,7 +89,7 @@ int ScopeV1::setup(unsigned int clk, bool chnlA, bool chnlB)
       return ret;
   }
 
-  unsigned char usb_buf[EPCFG_LEN];
+  unsigned char usb_buf[EPCTRL_LEN];
   unsigned char cfg_buf[4];
 
   //Setup channels
@@ -107,7 +107,7 @@ int ScopeV1::setup(unsigned int clk, bool chnlA, bool chnlB)
 
   //Send config packet
   int actual;
-  ret = libusb_bulk_transfer(dev, EPCFG, usb_buf, 4*3, &actual, USB_TIMEOUT);
+  ret = libusb_bulk_transfer(dev, EPCTRL, usb_buf, 4*3, &actual, USB_TIMEOUT);
   if(ret != 0)
   {
     fprintf(stderr, "Failed to send setup packet: %d\n", ret);
@@ -128,7 +128,7 @@ int ScopeV1::start()
       return ret;
   }
 
-  unsigned char usb_buf[EPCFG_LEN];
+  unsigned char usb_buf[EPCTRL_LEN];
   unsigned char cfg_buf[4];
 
   //Setup PD
@@ -137,7 +137,7 @@ int ScopeV1::start()
 
   //Send config packet
   int actual;
-  ret = libusb_bulk_transfer(dev, EPCFG, usb_buf, 4, &actual, USB_TIMEOUT);
+  ret = libusb_bulk_transfer(dev, EPCTRL, usb_buf, 4, &actual, USB_TIMEOUT);
   if(ret != 0)
   {
     fprintf(stderr, "Failed to send setup packet: %d\n", ret);
@@ -158,7 +158,7 @@ int ScopeV1::stop()
       return ret;
   }
 
-  unsigned char usb_buf[EPCFG_LEN];
+  unsigned char usb_buf[EPCTRL_LEN];
   unsigned char cfg_buf[4];
 
   //Setup PD
@@ -167,7 +167,7 @@ int ScopeV1::stop()
 
   //Send config packet
   int actual;
-  ret = libusb_bulk_transfer(dev, EPCFG, usb_buf, 4, &actual, USB_TIMEOUT);
+  ret = libusb_bulk_transfer(dev, EPCTRL, usb_buf, 4, &actual, USB_TIMEOUT);
   if(ret != 0)
   {
     fprintf(stderr, "Failed to send setup packet: %d\n", ret);

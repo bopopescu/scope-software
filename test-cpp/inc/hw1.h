@@ -82,7 +82,6 @@ class ScopeV1
   void processVoltChannel(unsigned char* raw, int len, float* volt);
 
   private:
-  libusb_context* ctx;
   libusb_device_handle* dev;
 };
 
