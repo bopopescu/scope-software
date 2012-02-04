@@ -25,6 +25,7 @@ ScopeV1::ScopeV1()
 
 ScopeV1::~ScopeV1()
 {
+  libusb_release_interface(dev, 1);
   libusb_exit(ctx);
 }
 
@@ -48,6 +49,29 @@ int ScopeV1::init()
   {
     fprintf(stderr, "Failed to find device. Is it plugged in?\n");
     return -1;
+  }
+
+  ret = libusb_kernel_driver_active(dev, 1);
+  if(ret == 1)
+  {
+    ret = libusb_detach_kernel_driver(dev, 1);
+    if(ret != 0)
+    {
+      fprintf(stderr, "Failed to detach kernel driver: %d\n", ret);
+      return -2;
+    }
+  }
+  else if(ret != 0)
+  {
+    fprintf(stderr, "Failed to check if kernel driver was active: %d\n",ret);
+    return -3;
+  }
+
+  ret = libusb_claim_interface(dev, 1);
+  if(ret != 0)
+  {
+    fprintf(stderr, "Failed to claim required interface: %d\n", ret);
+    return -4;
   }
 
   return 0;
