@@ -2,7 +2,6 @@
 
 require 'rubygems'
 require 'scruffy'
-require 'Qt4'
 
 require 'readline'
 
