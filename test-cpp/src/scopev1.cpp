@@ -111,13 +111,9 @@ int ScopeV1::setup(unsigned int clk, bool chnlA, bool chnlB)
   V1Format::genFX2Packet(FMT_DEST_ADC, FMT_WRITE, FMT_REG_CLKH, val, cfg_buf);
   memcpy(&usb_buf[8], cfg_buf, 4);
 
-  //Setup PD
-  V1Format::genFX2Packet(FMT_DEST_ADC, FMT_WRITE, FMT_REG_PD, 0, cfg_buf);
-  memcpy(&usb_buf[12], cfg_buf, 4);
-
   //Send config packet
   int actual;
-  ret = libusb_bulk_transfer(dev, EPCTRL, usb_buf, sizeof(usb_buf), &actual, USB_TIMEOUT);
+  ret = libusb_bulk_transfer(dev, EPCTRL, usb_buf, 4*3, &actual, USB_TIMEOUT);
   if(ret != 0)
   {
     fprintf(stderr, "Failed to send setup packet: %d\n", ret);

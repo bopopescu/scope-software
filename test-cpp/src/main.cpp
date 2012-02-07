@@ -37,7 +37,7 @@ int main(int argc, char** argv)
   }
   printf("Got scope device\n");
 
-  /*//Run scope to get some data in the buffers
+  //Run scope to get some data in the buffers
   printf("Running scope");
   ret = scope->start();
   if(ret != 0)
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     fprintf(stderr, "Failed to start sampling: %d\n", ret);
     delete scope;
     return -2;
-  }*/
+  }
 
   for(int i=0; i<100; i++)
   {
