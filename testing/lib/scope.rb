@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'usb'
 require 'terminal-table/import'
-require 'lib/constants'
-require 'lib/helpers'
+require 'constants'
+require 'helpers'
 
 module USBScope
   class Scope
@@ -44,7 +44,6 @@ module USBScope
     def scopewrite(cmd)
       s = cmd.pack("C*")
       s = s + "\000"*(ScopeEPCtrlLen-s.length)
-      self.dataprint s
       begin
         @handle.usb_bulk_write(ScopeEPCtrl,s,TIMEOUT)
       rescue
@@ -79,7 +78,6 @@ module USBScope
 
     def getInfo
       d = debugread(DebugCommands::Info)
-      dataprint d
       raise "Received wrong packet - not info" if d[0] != 0x15
       n = ' '
       cs_table = table do |t|

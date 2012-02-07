@@ -5,7 +5,7 @@ require 'scruffy'
 
 require 'readline'
 
-require 'lib/scope'
+require 'scope'
 include USBScope
 include CONST
 
@@ -16,7 +16,7 @@ end
 def getInfo
   i = 0
   begin
-    scope.getInfo
+    @scope.getInfo
   rescue
     if i < 3 then
       i += 1
@@ -28,47 +28,47 @@ def getInfo
 end
 
 def dataread
-  scope.dataprint scope.readep(0x81,64)
+  @scope.dataprint @scope.readep(0x81,64)
 end
 
 def testib
-  scope.scopewrite([scope.genOut(DEST_SCOPE, READ, REG_IB, 0x00),
-                   scope.genOut(DEST_SCOPE, READ, REG_IBA, 0x00),
-                   scope.genOut(DEST_SCOPE, READ, REG_IBB, 0x00)].flatten)
-  scope.dataprint scope.readep(USBCodes::ScopeEPCFG, 512)
+  @scope.scopewrite([@scope.genOut(DEST_SCOPE, READ, REG_IB, 0x00),
+                   @scope.genOut(DEST_SCOPE, READ, REG_IBA, 0x00),
+                   @scope.genOut(DEST_SCOPE, READ, REG_IBB, 0x00)].flatten)
+  @scope.dataprint @scope.readep(USBCodes::ScopeEPCFG, 512)
 end
 
 def ibainit
   #Setup relay, setup mux
-  scope.scopewrite([scope.genOut(DEST_IBA, WRITE, REG_RELAY, 0x03),
-                   scope.genOut(DEST_IBA, WRITE, REG_MUX0, 0x07)].flatten)
+  @scope.scopewrite([@scope.genOut(DEST_IBA, WRITE, REG_RELAY, 0x03),
+                   @scope.genOut(DEST_IBA, WRITE, REG_MUX0, 0x07)].flatten)
 end
 
 def scopeinit
   #Setup channels, setup clk, setup PD
-  scope.scopewrite([scope.genOut(DEST_ADC, WRITE, REG_CHNL, 0x03),
-                   scope.genOut(DEST_ADC, WRITE, REG_CLKL, 0xF0),
-                   scope.genOut(DEST_ADC, WRITE, REG_CLKH, 0x00),
-                   scope.genOut(DEST_ADC, WRITE, REG_PD, 0x00)].flatten)
+  @scope.scopewrite([@scope.genOut(DEST_ADC, WRITE, REG_CHNL, 0x03),
+                   @scope.genOut(DEST_ADC, WRITE, REG_CLKL, 0xF0),
+                   @scope.genOut(DEST_ADC, WRITE, REG_CLKH, 0x00),
+                   @scope.genOut(DEST_ADC, WRITE, REG_PD, 0x00)].flatten)
 end
 
 def stop
-  scope.scopewrite(scope.genOut(DEST_ADC, WRITE, REG_PD, 0x01))
+  @scope.scopewrite(@scope.genOut(DEST_ADC, WRITE, REG_PD, 0x01))
 end
 
 def start
-  scope.scopewrite(scope.genOut(DEST_ADC, WRITE, REG_PD, 0x00))
+  @scope.scopewrite(@scope.genOut(DEST_ADC, WRITE, REG_PD, 0x00))
 end
 
 def scoperead
-  scope.dataprint scope.scoperead
+  @scope.dataprint @scope.scoperead
 end
 
 def scoperepread
   File.open("/tmp/scopeout",'w') do |f|
     begin
       while true
-        f.write scope.scoperead
+        f.write @scope.scoperead
       end
     rescue
       f.close
@@ -81,8 +81,8 @@ def scoperepread2
   File.open("/tmp/scopeouta","w") do |fa|
     File.open("/tmp/scopeoutb","w") do |fb|
       begin
-        1000.times do
-          d = scope.scoperead
+        10.times do
+          d = @scope.scoperead
           which = 0;
           d.each_char do
             |x|
@@ -132,7 +132,7 @@ end
 ###############################################################################
 ###############################################################################
 
-scope = Scope.new
+@scope = Scope.new
 if ARGV.length > 0 then
   processAction ARGV[0]
 else
