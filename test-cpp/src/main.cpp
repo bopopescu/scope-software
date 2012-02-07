@@ -25,10 +25,19 @@ int main(int argc, char** argv)
 {
   int ret;
 
+  if(argc < 3)
+  {
+    fprintf(stderr, "Incorrectly called. Use: scope [clock] [sample-time]");
+    return -1;
+  }
+
+  int clock = atoi(argv[1]);
+  int sample = atoi(argv[2]);
+
   //Try to get device
   printf("Finding scope device.\n");
   ScopeV1* scope = new ScopeV1();
-  ret = scope->setup(0x00F0, true, true); //TODO: allow config from ARGV
+  ret = scope->setup(clock, true, true); //TODO: allow config from ARGV
   if(ret != 0)
   {
     fprintf(stderr, "Failed to get device: %d\n", ret);
@@ -47,7 +56,7 @@ int main(int argc, char** argv)
     return -2;
   }
 
-  for(int i=0; i<100; i++)
+  for(int i=0; i<sample; i++)
   {
     printf(".");
     usleep(10000);
