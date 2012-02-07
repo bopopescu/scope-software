@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include "hw1.h"
 
@@ -36,7 +37,7 @@ int main(int argc, char** argv)
   }
   printf("Got scope device\n");
 
-  //Run scope to get some data in the buffers
+  /*//Run scope to get some data in the buffers
   printf("Running scope");
   ret = scope->start();
   if(ret != 0)
@@ -44,7 +45,7 @@ int main(int argc, char** argv)
     fprintf(stderr, "Failed to start sampling: %d\n", ret);
     delete scope;
     return -2;
-  }
+  }*/
 
   for(int i=0; i<100; i++)
   {
@@ -65,6 +66,7 @@ int main(int argc, char** argv)
 
   //Get the data from the device
   unsigned char buf[MAX_READ];
+  memset(buf, 0, MAX_READ);
   int actual;
   printf("Getting data from buffers\n");
   ret = scope->read(buf, MAX_READ, &actual);

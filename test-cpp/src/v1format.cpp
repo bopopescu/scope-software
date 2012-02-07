@@ -21,6 +21,6 @@ void V1Format::genFX2Packet(unsigned char dest, bool read, unsigned char reg, un
 {
   buf[0] = FMT_MAGIC;
   buf[1] = dest;
-  buf[2] = (read? FMT_READ : FMT_WRITE) & (reg << 1);
+  buf[2] = (read? FMT_READ : FMT_WRITE) | (reg << 1);
   buf[3] = value;
 }

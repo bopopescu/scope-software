@@ -91,9 +91,15 @@ int ScopeV1::setup(unsigned int clk, bool chnlA, bool chnlB)
 
   unsigned char usb_buf[EPCTRL_LEN];
   unsigned char cfg_buf[4];
+  unsigned char val;
+  memset(usb_buf,0,EPCTRL_LEN);
 
   //Setup channels
-  unsigned char val = chnlA & (chnlB << 1);
+  val = 0x00;
+  if(chnlA)
+    val |= 0x01;
+  if(chnlB)
+    val |= 0x02;
   V1Format::genFX2Packet(FMT_DEST_ADC, FMT_WRITE, FMT_REG_CHNL, val, cfg_buf);
   memcpy(usb_buf, cfg_buf, 4);
 
@@ -105,9 +111,13 @@ int ScopeV1::setup(unsigned int clk, bool chnlA, bool chnlB)
   V1Format::genFX2Packet(FMT_DEST_ADC, FMT_WRITE, FMT_REG_CLKH, val, cfg_buf);
   memcpy(&usb_buf[8], cfg_buf, 4);
 
+  //Setup PD
+  V1Format::genFX2Packet(FMT_DEST_ADC, FMT_WRITE, FMT_REG_PD, 0, cfg_buf);
+  memcpy(&usb_buf[12], cfg_buf, 4);
+
   //Send config packet
   int actual;
-  ret = libusb_bulk_transfer(dev, EPCTRL, usb_buf, 4*3, &actual, USB_TIMEOUT);
+  ret = libusb_bulk_transfer(dev, EPCTRL, usb_buf, sizeof(usb_buf), &actual, USB_TIMEOUT);
   if(ret != 0)
   {
     fprintf(stderr, "Failed to send setup packet: %d\n", ret);
@@ -130,6 +140,7 @@ int ScopeV1::start()
 
   unsigned char usb_buf[EPCTRL_LEN];
   unsigned char cfg_buf[4];
+  memset(usb_buf,0,EPCTRL_LEN);
 
   //Setup PD
   V1Format::genFX2Packet(FMT_DEST_ADC, FMT_WRITE, FMT_REG_PD, 0, cfg_buf);
@@ -160,6 +171,7 @@ int ScopeV1::stop()
 
   unsigned char usb_buf[EPCTRL_LEN];
   unsigned char cfg_buf[4];
+  memset(usb_buf,0,EPCTRL_LEN);
 
   //Setup PD
   V1Format::genFX2Packet(FMT_DEST_ADC, FMT_WRITE, FMT_REG_PD, 1, cfg_buf);
