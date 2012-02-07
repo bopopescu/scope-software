@@ -19,7 +19,7 @@
 #include <time.h>
 #include "hw1.h"
 
-#define MAX_READ EPDATA_LEN*20
+#define MAX_READ EPDATA_LEN*200
 
 int main(int argc, char** argv)
 {
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 
   for(int i=0; i<chnlLen; i++)
   {
-    ret = fprintf(fd, "%d,%.5f,%.5f", i, voltChnlA[i], voltChnlB[i]);
+    ret = fprintf(fd, "%d,%.5f,%.5f\n", i, voltChnlA[i], voltChnlB[i]);
     if(ret < 0)
     {
       fprintf(stderr, "Failed to write line %d\n",i);
