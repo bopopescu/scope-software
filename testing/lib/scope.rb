@@ -16,9 +16,19 @@ module USBScope
       @usb_status = :connected
     end
 
+    def bytes(x)
+      ba = []
+      x.each_byte do
+        |b|
+        ba.push b.to_i
+      end
+
+      ba
+    end
+
     def dataprint(x)
       x.each_byte { |b|
-        print b.to_s(16)
+        print b.to_s(16) + " "
       }
       print "\n"
     end
@@ -77,7 +87,7 @@ module USBScope
     end
 
     def getInfo
-      d = debugread(DebugCommands::Info)
+      d = bytes debugread(DebugCommands::Info)
       raise "Received wrong packet - not info" if d[0] != 0x15
       n = ' '
       cs_table = table do |t|
