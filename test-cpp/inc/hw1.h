@@ -19,7 +19,7 @@
 
 #define SCOPE_VID       0xaaaa
 #define SCOPE_PID       0x0200
-#define USB_TIMEOUT     300
+#define USB_TIMEOUT     10
 
 #define EPCTRL_LEN      512
 #define EPCTRL          0x04

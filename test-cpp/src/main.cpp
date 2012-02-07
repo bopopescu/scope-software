@@ -19,7 +19,7 @@
 #include <time.h>
 #include "hw1.h"
 
-#define MAX_READ EPDATA_LEN*200
+#define MAX_READ EPDATA_LEN*10
 
 int main(int argc, char** argv)
 {
@@ -32,7 +32,7 @@ int main(int argc, char** argv)
   }
 
   int clock = atoi(argv[1]);
-  int sample = atoi(argv[2]);
+  int samples = atoi(argv[2]);
 
   //Try to get device
   printf("Finding scope device.\n");
@@ -56,10 +56,27 @@ int main(int argc, char** argv)
     return -2;
   }
 
-  for(int i=0; i<sample; i++)
+  //Get the data from the device whilst running
+  int actual;
+  int offset = 0;
+  unsigned char buf[MAX_READ*samples];
+  memset(buf, 0, MAX_READ*samples);
+
+  for(int i=0; i<samples; i++)
   {
+    printf("Getting data from buffers\n");
+    ret = scope->read(&buf[offset], MAX_READ, &actual);
+    if(ret != 0 && ret != LIBUSB_ERROR_TIMEOUT)
+    {
+      fprintf(stderr, "Failed to get data from device\n");
+      delete scope;
+      return -4;
+    }
+    offset += actual;
+    printf("Got %d bytes from device\n", actual);
+
     printf(".");
-    usleep(10000);
+    usleep(1000);
   }
 
   ret = scope->stop();
@@ -72,25 +89,9 @@ int main(int argc, char** argv)
 
   printf("Done\n");
 
-
-  //Get the data from the device
-  unsigned char buf[MAX_READ];
-  memset(buf, 0, MAX_READ);
-  int actual;
-  printf("Getting data from buffers\n");
-  ret = scope->read(buf, MAX_READ, &actual);
-  if(ret != 0 && ret != LIBUSB_ERROR_TIMEOUT)
-  {
-    fprintf(stderr, "Failed to get data from device\n");
-    delete scope;
-    return -4;
-  }
-
-  printf("Got %d bytes from device\n", actual);
-
   //Do some processing to get into a sensible form
-  int chnlLen = actual;
-  if((actual % 2) != 0)
+  int chnlLen = offset;
+  if((offset % 2) != 0)
     chnlLen--;
 
   unsigned char* rawChnlA = (unsigned char*)malloc(chnlLen);

@@ -182,6 +182,16 @@ int ScopeV1::stop()
     return -1;
   }
 
+
+  //Perform a read to ensure this gets received, since the scope checks for config packets, once it stops being stuck waiting for the data
+  unsigned char buf[EPDATA_LEN];
+  ret = libusb_bulk_transfer(dev, EPDATA, buf, EPDATA_LEN, &actual, USB_TIMEOUT);
+  if(ret != 0)
+  {
+    fprintf(stderr, "Failed to read data: %d\n", ret);
+    return ret;
+  }
+
   return 0;
 }
 
