@@ -193,7 +193,7 @@ int ScopeV1::read(unsigned char* buf, int len, int* actual)
   if(ret != 0)
   {
     fprintf(stderr, "Failed to read data: %d\n", ret);
-    return -1;
+    return ret;
   }
 
   return 0;
