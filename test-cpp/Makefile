@@ -2,7 +2,7 @@ INCLUDE=-Iinc/ -I/usr/include/libusb-1.0/
 LIBS=-lusb-1.0
 
 CXX=g++
-CXXFLAGS=-Wall -Werror
+CXXFLAGS=-Wall -g -O0
 
 scope: main.o scopev1.o v1format.o
 	${CXX} ${CXXFLAGS} -o scope main.o scopev1.o v1format.o ${INCLUDE} ${LIBDIRS} ${LIBS}
