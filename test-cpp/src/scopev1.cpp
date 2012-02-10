@@ -24,8 +24,11 @@ ScopeV1::ScopeV1()
 
 ScopeV1::~ScopeV1()
 {
-  libusb_release_interface(dev, 1);
-  libusb_close(dev);
+  if(dev != NULL)
+  {
+    libusb_release_interface(dev, 1);
+    libusb_close(dev);
+  }
   libusb_exit(NULL);
 }
 
