@@ -37,6 +37,10 @@ def setLMHOptions(device, lp, highgain, ladder):
   datahigh = 0 | ((lp & 0x04) >> 2)
   datalow = ((lp & 0x03) << 6) | ((highgain & 0x01) << 4) | (ladder & 0x0F)
 
+  print "Current LMH options:"
+  readLMHOptions(device)
+  print "-------------------"
+
   #Send
   bp = RAW_WIRE(device, 115200)
   bp.BBmode()
@@ -52,6 +56,45 @@ def setLMHOptions(device, lp, highgain, ladder):
   bp.CS_High()
   bp.resetBP()
 
+  print "New LMH options:"
+  readLMHOptions(device)
+  print "-------------------"
+
+def readLMHOptions(device):
+  bp = RAW_WIRE(device, 115200)
+  bp.BBmode()
+  bp.enter_rawwire()
+  bp.raw_cfg_pins(PinCfg.POWER | PinCfg.CS)
+  if not bp.cfg_raw_wire((RAW_WIRECfg.BIT_ORDER & RAW_WIRE_BIT_ORDER_TYPE.MSB) |
+                         (RAW_WIRECfg.WIRES & RAW_WIRE_WIRES_TYPE.TWO) |
+                         (RAW_WIRECfg.OUT_TYPE & RAW_WIRE_OUT_TYPE._3V3)):
+    raise IOError, "Failed to set pin type correctly"
+  bp.set_speed(RAW_WIRESpeed._400KHZ)
+  bp.CS_Low()
+  bp.bulk_trans(1, [0x80])
+  datahigh = bp.read_byte()
+  datalow = bp.read_byte()
+  bp.CS_High()
+  bp.resetBP()
+
+  data = (datahigh << 8) | datalow
+  if (data & 0x0200) == 0:
+    print "Power: full"
+  else:
+    print "Power: aux hi-z"
+
+  bw = ["full", "20", "100", "200", "350", "650", "750", "x"]
+  value = (data & 0x00E0) >> 6
+  print "Filter: %s MHz" % bw[value]
+
+  if (data & 0x0010) == 0:
+    print "Pre-amp: low gain"
+  else:
+    print "Pre-amp: high gain"
+
+  ladder = ["0", "-2", "-4", "-6", "-8", "-10", "-12", "-14", "-16", "-18", "-20", "x", "x", "x", "x", "x"]
+  value = data & 0x000F
+  print "Attenuation: %s dB" % ladder[value]
 
 #--------------------------------------------------------------------
 #Main program routine
